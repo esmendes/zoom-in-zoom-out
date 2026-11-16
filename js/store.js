@@ -3,13 +3,13 @@ class RoomStore {
     this.roomId = roomId; // ex: 'sala-1', 'sala-2', 'sala-3', 'sala-4'
     this.storageKey = `zoom_game_${roomId}`;
     this.listeners = [];
-    this.useFirebase = Boolean(FIREBASE_CONFIG && FIREBASE_CONFIG.databaseURL);
+    this.useFirebase = Boolean(typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG && FIREBASE_CONFIG.databaseURL);
     this.dbRef = null;
     this.channel = null;
 
     this._onStorage = (e) => {
       if (e.key === this.storageKey && e.newValue) {
-        this.notify(JSON.parse(e.newValue));
+        this.notify(this._normalizeState(JSON.parse(e.newValue)));
       }
     };
 
@@ -20,7 +20,7 @@ class RoomStore {
       this.dbRef = firebase.database().ref(`rooms/${this.roomId}`);
       this._onFirebaseValue = (snapshot) => {
         const val = snapshot.val();
-        if (val) this.notify(val);
+        this.notify(this._normalizeState(val));
       };
       this.dbRef.on('value', this._onFirebaseValue);
     } else {
@@ -28,10 +28,20 @@ class RoomStore {
       if ('BroadcastChannel' in window) {
         this.channel = new BroadcastChannel(this.storageKey);
         this.channel.onmessage = (e) => {
-          if (e.data) this.notify(e.data);
+          if (e.data) this.notify(this._normalizeState(e.data));
         };
       }
     }
+  }
+
+  _normalizeState(raw) {
+    const base = this.getDefaultState();
+    if (!raw) return base;
+    return {
+      ...base,
+      ...raw,
+      players: raw.players || {}
+    };
   }
 
   getDefaultState() {
@@ -40,6 +50,7 @@ class RoomStore {
       totalCards: 10,
       status: 'waiting', // 'waiting' | 'playing' | 'revealed'
       locked: false,
+      timerEndsAt: null,
       players: {},
       updatedAt: Date.now()
     };
@@ -48,24 +59,37 @@ class RoomStore {
   async getState() {
     if (this.useFirebase && this.dbRef) {
       const snap = await this.dbRef.once('value');
-      return snap.val() || this.getDefaultState();
+      return this._normalizeState(snap.val());
     }
     const raw = localStorage.getItem(this.storageKey);
-    return raw ? JSON.parse(raw) : this.getDefaultState();
+    return this._normalizeState(raw ? JSON.parse(raw) : null);
   }
 
   async setState(newState) {
-    newState.updatedAt = Date.now();
+    const normalized = this._normalizeState(newState);
+    normalized.updatedAt = Date.now();
     if (this.useFirebase && this.dbRef) {
-      await this.dbRef.set(newState);
+      await this.dbRef.set(normalized);
     } else {
-      localStorage.setItem(this.storageKey, JSON.stringify(newState));
-      if (this.channel) this.channel.postMessage(newState);
-      this.notify(newState);
+      localStorage.setItem(this.storageKey, JSON.stringify(normalized));
+      if (this.channel) this.channel.postMessage(normalized);
+      this.notify(normalized);
     }
   }
 
   async updateState(mutatorFn) {
+    if (this.useFirebase && this.dbRef) {
+      let resultState = null;
+      await this.dbRef.transaction((current) => {
+        const base = this._normalizeState(current);
+        const updated = mutatorFn(base) || base;
+        updated.updatedAt = Date.now();
+        resultState = updated;
+        return updated;
+      });
+      return resultState;
+    }
+
     const current = await this.getState();
     const cloned = typeof structuredClone === 'function'
       ? structuredClone(current)

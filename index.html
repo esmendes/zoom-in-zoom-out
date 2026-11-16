@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facilitador — Zoom In, Zoom Out</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span>🔍 Zoom In, Zoom Out</span>
+      <span class="badge badge-accent">PAINEL DO FACILITADOR</span>
+    </div>
+
+    <nav class="room-tabs" aria-label="Seleção de Salas">
+      <button type="button" class="room-tab active" data-room="sala-1">Sala 1</button>
+      <button type="button" class="room-tab" data-room="sala-2">Sala 2</button>
+      <button type="button" class="room-tab" data-room="sala-3">Sala 3</button>
+      <button type="button" class="room-tab" data-room="sala-4">Sala 4</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-row">
+            <h1 class="card-title" id="roomTitleDisplay">Controle da SALA-1</h1>
+            <span class="badge badge-status waiting" id="roomStatusBadge">Aguardando início</span>
+            <span class="badge badge-neutral" id="playersCountBadge">0 jogadores</span>
+          </div>
+          <p class="card-subtitle">Gerencie a distribuição de cartas, acompanhe o posicionamento e revele o gabarito.</p>
+        </div>
+
+        <div class="action-toolbar">
+          <button type="button" class="btn btn-outline" id="toggleSpyBtn">👁️ Ver Gabarito (Espião)</button>
+          <button type="button" class="btn btn-outline" id="lockBoardBtn">🔒 Travar Tabuleiro</button>
+          <button type="button" class="btn btn-success" id="revealBtn">✨ Revelar Cartas</button>
+          <button type="button" class="btn btn-danger-outline" id="resetRoomBtn">🗑️ Resetar Sala</button>
+        </div>
+      </div>
+
+      <div class="host-controls-grid">
+        <div class="form-group">
+          <label for="cardCountInput">Quantidade de Cartas na Sala (2 a 30)</label>
+          <input type="number" id="cardCountInput" min="2" max="30" value="10" />
+        </div>
+
+        <button type="button" class="btn btn-accent" id="startGameBtn">
+          🃏 Sortear e Distribuir Cartas
+        </button>
+
+        <div class="share-box">
+          <strong>Link da Sala:</strong>
+          <code id="playerLinkCode">sala-1.html</code>
+          <button type="button" class="btn btn-outline btn-sm" id="copyLinkBtn">📋 Copiar</button>
+          <a href="sala-1.html" target="_blank" class="btn btn-primary btn-sm" id="openPlayerTabBtn">
+            Abrir Sala ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="roster-section">
+        <div class="roster-header">
+          <span>Participantes Conectados</span>
+          <span id="placementProgressText">0/10 posicionados</span>
+        </div>
+        <div class="roster-list" id="playersRoster"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">Tabuleiro da Sala</h2>
+          <p class="card-subtitle">Clique em qualquer carta visível para ampliá-la em tela cheia.</p>
+        </div>
+        <div id="scoreSummaryBadge"></div>
+      </div>
+
+      <div class="zoom-scale-bar">
+        <div class="scale-end">🔍 <span>Posição #1 • Detalhe Mais Próximo (Zoom In)</span></div>
+        <div class="scale-line"></div>
+        <div class="scale-end"><span>Última Posição • Visão Mais Ampla (Zoom Out)</span> 🌍</div>
+      </div>
+
+      <div class="timeline-grid" id="hostTimelineGrid"></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/host.js"></script>
+</body>
+</html>

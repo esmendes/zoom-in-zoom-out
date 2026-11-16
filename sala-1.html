@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sala 1 — Zoom In, Zoom Out</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-room="sala-1">
+  <header class="topbar">
+    <div class="brand">
+      <span>🔍 Zoom In, Zoom Out</span>
+      <span class="badge badge-accent" id="roomBadge">SALA-1</span>
+    </div>
+    <div class="topbar-right" id="playerHeaderRight" style="display:none;">
+      <span class="player-Chip" id="playerNameHeader"></span>
+      <button type="button" class="btn btn-ghost-light" id="leaveRoomBtn" title="Trocar de nome ou sair">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card join-screen" id="joinScreen">
+      <div class="join-icon">🔍</div>
+      <h1 class="card-title">Bem-vindo à Sala 1</h1>
+      <p class="card-subtitle">
+        Digite seu nome para entrar na dinâmica e receber sua imagem secreta.
+      </p>
+      <form id="joinForm" class="join-form">
+        <input type="text" id="playerNameInput" placeholder="Como quer ser chamado?" required maxlength="25" autocomplete="off" />
+        <button type="submit" class="btn btn-accent btn-block">Entrar na Sala</button>
+      </form>
+    </section>
+
+    <div class="player-layout" id="gameScreen" style="display:none;">
+      <aside class="card secret-card-box">
+        <h2 class="card-title">Sua Imagem Secreta</h2>
+        <div class="secret-image-frame" id="secretImageFrame">
+          <img id="secretCardImg" src="" alt="Sua carta secreta" />
+          <span class="zoom-hint-pill">🔍 Clique para ampliar</span>
+          <div class="shield-overlay">
+            <span style="font-size:1.8rem;">🙈</span>
+            <span>Imagem oculta para proteger seu segredo</span>
+          </div>
+        </div>
+        <p id="secretCardStatus" class="card-subtitle" style="margin-bottom:1rem;"></p>
+        <button type="button" class="btn btn-outline btn-block" id="toggleShieldBtn">
+          🙈 Ocultar Minha Carta
+        </button>
+      </aside>
+
+      <section class="card">
+        <div id="boardStatusBanner" style="display:none;"></div>
+
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2 class="card-title">Sequência da Equipe</h2>
+            <p class="card-subtitle">
+              Conversem entre si e ordenem as cartas da visão mais próxima (Posição 1) até a mais ampla.
+            </p>
+          </div>
+        </div>
+
+        <div class="zoom-scale-bar">
+          <div class="scale-end">🔍 <span>Posição #1 • Detalhe Mais Próximo (Zoom In)</span></div>
+          <div class="scale-line"></div>
+          <div class="scale-end"><span>Última Posição • Visão Mais Ampla (Zoom Out)</span> 🌍</div>
+        </div>
+
+        <div class="timeline-grid" id="playerTimelineGrid"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/player.js"></script>
+</body>
+</html>
